@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26730.16
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LangVersionFixer", "LangVersionFixer\LangVersionFixer.csproj", "{DC927AA1-8FEA-464F-BFE6-94C72AA8FAF7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CsprojLangVersionFixer", "CsprojLangVersionFixer\CsprojLangVersionFixer.csproj", "{DC927AA1-8FEA-464F-BFE6-94C72AA8FAF7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test.Unit.CsprojLangVersionFixer", "Test.Unit.CsprojLangVersionFixer\Test.Unit.CsprojLangVersionFixer.csproj", "{8706D57F-55BC-4C96-87AC-5B8A7BAD4996}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{DC927AA1-8FEA-464F-BFE6-94C72AA8FAF7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DC927AA1-8FEA-464F-BFE6-94C72AA8FAF7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DC927AA1-8FEA-464F-BFE6-94C72AA8FAF7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8706D57F-55BC-4C96-87AC-5B8A7BAD4996}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8706D57F-55BC-4C96-87AC-5B8A7BAD4996}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8706D57F-55BC-4C96-87AC-5B8A7BAD4996}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8706D57F-55BC-4C96-87AC-5B8A7BAD4996}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
