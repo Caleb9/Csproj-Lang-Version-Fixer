@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using CsprojLangVersionFixer;
 using NUnit.Framework;
 
@@ -6,6 +7,7 @@ namespace Test.Unit.CsprojLangVersionFixer
 {
     [TestFixture]
     [TestOf(typeof(CommandLineArgumentsParser))]
+    [ExcludeFromCodeCoverage]
     public class CommandLineArgumentsParserTests
     {
         [Test]

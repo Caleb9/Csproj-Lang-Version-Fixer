@@ -12,51 +12,87 @@ namespace CsprojLangVersionFixer
     /// </summary>
     public sealed class Fixer
     {
+        /// <summary>
+        ///     Possible langVersion values.
+        /// </summary>
+        public enum LangVersionPropertyValues
+        {
+            /// <summary>
+            ///     Latest major version.
+            /// </summary>
+            Default,
+
+            /// <summary>
+            ///     Latest minor version.
+            /// </summary>
+            Latest
+        }
+
         private const string LangVersionPropertyName = "LangVersion";
-        private const string LangVersionPropertyValue = "latest";
+        [NotNull] private readonly string _langVersionValue;
+
+        /// <summary>
+        /// </summary>
+        /// <param name="langVersion"></param>
+        public Fixer(LangVersionPropertyValues langVersion = LangVersionPropertyValues.Latest)
+        {
+            switch (langVersion)
+            {
+                case LangVersionPropertyValues.Default:
+                    _langVersionValue = "default";
+                    break;
+                case LangVersionPropertyValues.Latest:
+                    _langVersionValue = "latest";
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(langVersion), langVersion, null);
+            }
+        }
 
 
         /// <exception cref="ArgumentException">Value cannot be null or whitespace.</exception>
         /// <exception cref="InvalidProjectFileException">If the evaluation fails.</exception>
         [NotNull]
-        public Project Fix(
-            [NotNull] string projectFilePath)
-        {
-            if (string.IsNullOrWhiteSpace(projectFilePath))
-            {
-                throw new ArgumentException("Value cannot be null or whitespace.", nameof(projectFilePath));
-            }
-
-            var project = new Project(projectFilePath);
-            foreach (ProjectPropertyGroupElement propertyGroupElement in GetPropertyGroupsThatNeedFixing(project))
-            {
-                propertyGroupElement.AddProperty(LangVersionPropertyName, LangVersionPropertyValue);
-            }
-
-            return project;
-        }
-
-        private IEnumerable<ProjectPropertyGroupElement> GetPropertyGroupsThatNeedFixing(
+        public void Fix(
             [NotNull] Project project)
         {
-            return
-                project
-                    .Xml
-                    .PropertyGroups
-                    .Where(g => HasConfigurationPlatformCondition(g) && !HasProperty(g, LangVersionPropertyName));
+            if (project == null)
+            {
+                throw new ArgumentNullException(nameof(project));
+            }
+
+            var needsNewPropertyGroup = true;
+
+            /* First, remove all LangVersion properties with a configuration condition */
+            foreach (ProjectPropertyGroupElement propertyGroupElement in
+                GetPropertyGroupsWithLangVersionProperty(project))
+            {
+                if (propertyGroupElement.Condition == string.Empty)
+                {
+                    /* This property group already defines LangVersion for all configurations. We only need to set it
+                     * to the requested value. */
+                    needsNewPropertyGroup = false;
+                    propertyGroupElement.SetProperty(LangVersionPropertyName, _langVersionValue);
+                    continue;
+                }
+
+                ProjectPropertyElement langVersionProperty =
+                    propertyGroupElement.Properties.Single(p => p.Name == LangVersionPropertyName);
+                propertyGroupElement.RemoveChild(langVersionProperty);
+            }
+
+            if (needsNewPropertyGroup)
+            {
+                /* Add PropertyGroup containing LangVersion for all build configurations */
+                ProjectPropertyGroupElement newPropertyGroup = project.Xml.AddPropertyGroup();
+                newPropertyGroup.AddProperty(LangVersionPropertyName, _langVersionValue);
+            }
         }
 
-        private bool HasConfigurationPlatformCondition(
-            [NotNull] ProjectElement propertyGroup)
+        private IEnumerable<ProjectPropertyGroupElement> GetPropertyGroupsWithLangVersionProperty(
+            [NotNull] Project project)
         {
-            return propertyGroup.Condition.StartsWith(@"'$(Configuration)|$(Platform)' == ");
-        }
-
-        private bool HasProperty(
-            [NotNull] ProjectPropertyGroupElement propertyGroup,
-            [NotNull] string propertyName)
-        {
-            return propertyGroup.Properties.Any(p => p.Name == propertyName);
+            return project.Xml.PropertyGroups.Where(g => g.Properties.Any(p => p.Name == LangVersionPropertyName));
         }
     }
 }

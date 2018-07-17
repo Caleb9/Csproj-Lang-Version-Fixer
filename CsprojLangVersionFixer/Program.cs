@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Build.Evaluation;
 
@@ -11,14 +12,6 @@ namespace CsprojLangVersionFixer
         /// <exception cref="ArgumentException">Specify project file.</exception>
         public static int Main(string[] args)
         {
-            /* Quickfix to https://github.com/Microsoft/msbuild/issues/2369 */
-            Environment.SetEnvironmentVariable(
-                "VSINSTALLDIR",
-                @"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional");
-            Environment.SetEnvironmentVariable(
-                "VisualStudioVersion",
-                @"15.0");
-
             CommandLineArgumentsParser commandLineArguments;
             try
             {
@@ -36,19 +29,23 @@ namespace CsprojLangVersionFixer
                 return 0;
             }
 
-            ProcessFiles(commandLineArguments);
+            ProcessFiles(commandLineArguments.ProjectFilePaths, commandLineArguments.DryRun);
 
             return 0;
         }
 
-        private static void ProcessFiles(CommandLineArgumentsParser commandLineArguments)
+        private static void ProcessFiles(
+            IEnumerable<string> projectFilePaths,
+            bool dryRun = false)
         {
             var fixer = new Fixer();
-            foreach (string projectFile in commandLineArguments.ProjectFilePaths)
+            foreach (string projectFile in projectFilePaths)
             {
                 try
                 {
-                    Project project = fixer.Fix(projectFile);
+                    var project = new Project(projectFile);
+
+                    fixer.Fix(project);
 
                     if (!project.IsDirty)
                     {
@@ -56,7 +53,7 @@ namespace CsprojLangVersionFixer
                         continue;
                     }
 
-                    if (!commandLineArguments.DryRun)
+                    if (!dryRun)
                     {
                         project.Save();
                         Console.WriteLine($"{projectFile}: updated");
@@ -68,7 +65,7 @@ namespace CsprojLangVersionFixer
                 }
                 catch (Exception e)
                 {
-                    Console.Error.WriteLine($"{projectFile}: {e.Message}");
+                    Console.Error.WriteLine($"{projectFile}: {e}");
                 }
             }
         }

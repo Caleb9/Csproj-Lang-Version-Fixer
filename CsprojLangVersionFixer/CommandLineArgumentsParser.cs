@@ -9,6 +9,7 @@ namespace CsprojLangVersionFixer
     /// </summary>
     public sealed class CommandLineArgumentsParser
     {
+        // TODO add possibility to specify LangVersion value (possibly better to use library such as CommandLineParser).
         private const string DryRunSwitch = "-d";
         private const string HelpSwitch = "-h";
 
@@ -54,20 +55,26 @@ Options:
         /// <param name="args"></param>
         /// <returns>New instance of <see cref="CommandLineArgumentsParser" /></returns>
         [NotNull]
-        public static CommandLineArgumentsParser Parse(string[] args)
+        public static CommandLineArgumentsParser Parse([NotNull] string[] args)
         {
+            if (args == null)
+            {
+                throw new ArgumentNullException(nameof(args));
+            }
+
             List<string> validArgs =
                 args
                     .Where(s => Switches.Contains(s) || s.EndsWith(".csproj", StringComparison.OrdinalIgnoreCase))
                     .ToList();
             if (validArgs.Count != args.Length)
             {
-                throw new ArgumentException("Invalid parameters detected.");
+                string firstInvalidParam = args.Except(validArgs).First();
+                throw new ArgumentException($"Invalid parameter detected: {firstInvalidParam}");
             }
 
             return new CommandLineArgumentsParser(
                 validArgs.Where(s => !Switches.Contains(s)).ToHashSet(),
-                args.Contains(DryRunSwitch),
+                validArgs.Contains(DryRunSwitch),
                 validArgs.Contains(HelpSwitch));
         }
     }
