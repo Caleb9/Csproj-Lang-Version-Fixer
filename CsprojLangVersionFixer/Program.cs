@@ -9,7 +9,6 @@ namespace CsprojLangVersionFixer
     /// </summary>
     public static class Program
     {
-        /// <exception cref="ArgumentException">Specify project file.</exception>
         public static int Main(string[] args)
         {
             CommandLineArgumentsParser commandLineArguments;
