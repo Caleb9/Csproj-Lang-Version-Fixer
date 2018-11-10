@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle( "Csproj Lang Version Fixer" )]
-[assembly: AssemblyDescription( "Sets <LangVersion> to latest in .csproj file." )]
+[assembly: AssemblyTitle( ".csproj File Fixer" )]
+[assembly: AssemblyDescription( "Sets <LangVersion> and/or <TargetFrameworkVersion> in .csproj file." )]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct( "CsprojLangVersionFixer" )]
+[assembly: AssemblyProduct( "CsprojFixer" )]
 [assembly: AssemblyCopyright( "Copyright © Caleb9 2018" )]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

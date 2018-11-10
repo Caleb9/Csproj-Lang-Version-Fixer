@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Xml;
-using CsprojLangVersionFixer;
+using CsprojFixer.Fixer;
 using Microsoft.Build.Evaluation;
 using NUnit.Framework;
 
@@ -14,7 +14,7 @@ namespace Test.Unit.CsprojLangVersionFixer
     ///     These are practically integration tests since they depend so much on Microsoft.Build.
     /// </summary>
     [TestFixture]
-    [TestOf(typeof(Fixer))]
+    [TestOf(typeof(GenericFixer))]
     [ExcludeFromCodeCoverage]
     public class FixerTests
     {
@@ -30,13 +30,13 @@ namespace Test.Unit.CsprojLangVersionFixer
             return new Project(xmlReader);
         }
 
-        private Fixer CreateSut()
+        private GenericFixer CreateLangVersionFixerSut()
         {
-            return new Fixer();
+            return new GenericFixer("LangVersion", "latest");
         }
 
         [Test]
-        [Description(nameof(Fixer.Fix))]
+        [Description(nameof(GenericFixer.Fix))]
         public void Fix_ProjectContainsConditionalLangVersion_ConditionalLangVersionIsRemoved()
         {
             /* Arrange */
@@ -46,7 +46,7 @@ namespace Test.Unit.CsprojLangVersionFixer
                     <LangVersion>default</LangVersion>
                 </PropertyGroup>";
             Project project = CreateFakeProjectFromXml(unconditionalPropertyGroup);
-            Fixer sut = CreateSut();
+            GenericFixer sut = CreateLangVersionFixerSut();
 
             /* Act */
             sut.Fix(project);
@@ -59,7 +59,7 @@ namespace Test.Unit.CsprojLangVersionFixer
         }
 
         [Test]
-        [Description(nameof(Fixer.Fix))]
+        [Description(nameof(GenericFixer.Fix))]
         public void Fix_ProjectContainsConditionalLangVersion_UnconditionalLangVersionIsAdded()
         {
             /* Arrange */
@@ -69,7 +69,7 @@ namespace Test.Unit.CsprojLangVersionFixer
                     <LangVersion>default</LangVersion>
                 </PropertyGroup>";
             Project project = CreateFakeProjectFromXml(unconditionalPropertyGroup);
-            Fixer sut = CreateSut();
+            GenericFixer sut = CreateLangVersionFixerSut();
 
             /* Act */
             sut.Fix(project);
@@ -82,7 +82,7 @@ namespace Test.Unit.CsprojLangVersionFixer
         }
 
         [Test]
-        [Description(nameof(Fixer.Fix))]
+        [Description(nameof(GenericFixer.Fix))]
         public void Fix_ProjectContainsUnconditionalLangVersion_ProjectIsNotModified()
         {
             /* Arrange */
@@ -90,7 +90,7 @@ namespace Test.Unit.CsprojLangVersionFixer
                 @"<PropertyGroup><LangVersion>latest</LangVersion></PropertyGroup>";
             Project project = CreateFakeProjectFromXml(unconditionalPropertyGroup);
             Debug.Assert(!project.IsDirty);
-            Fixer sut = CreateSut();
+            GenericFixer sut = CreateLangVersionFixerSut();
 
             /* Act */
             sut.Fix(project);
@@ -100,14 +100,14 @@ namespace Test.Unit.CsprojLangVersionFixer
         }
 
         [Test]
-        [Description(nameof(Fixer.Fix))]
+        [Description(nameof(GenericFixer.Fix))]
         public void Fix_ProjectContainsWrongLangVersion_LangVersionIsSet()
         {
             /* Arrange */
             const string unconditionalPropertyGroup =
                 @"<PropertyGroup><LangVersion>default</LangVersion></PropertyGroup>";
             Project project = CreateFakeProjectFromXml(unconditionalPropertyGroup);
-            Fixer sut = CreateSut();
+            GenericFixer sut = CreateLangVersionFixerSut();
 
             /* Act */
             sut.Fix(project);
@@ -120,12 +120,12 @@ namespace Test.Unit.CsprojLangVersionFixer
         }
 
         [Test]
-        [Description(nameof(Fixer.Fix))]
+        [Description(nameof(GenericFixer.Fix))]
         public void Fix_ProjectDoesNotContainLangVersion_LangVersionIsAdded()
         {
             /* Arrange */
             Project project = CreateFakeProjectFromXml();
-            Fixer sut = CreateSut();
+            GenericFixer sut = CreateLangVersionFixerSut();
 
             /* Act */
             sut.Fix(project);

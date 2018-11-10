@@ -1,43 +1,47 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using CsprojFixer.Fixer;
+using CsprojFixer.InputParsing;
 using Microsoft.Build.Evaluation;
 
-namespace CsprojLangVersionFixer
+namespace CsprojFixer
 {
     /// <summary>
     /// </summary>
     public static class Program
     {
+        /// <summary>
+        /// </summary>
         public static int Main(string[] args)
         {
-            CommandLineArgumentsParser commandLineArguments;
+            var parser = new CustomParserProxy(Console.Error);
+            IEnumerable<string> validPaths = null;
+            if (!parser.TryParse(args, out Options options) ||
+                !parser.TrySelectCsprojFilePaths(options.ProjectFilePaths, out validPaths))
+            {
+                Environment.Exit(1);
+            }
+
+            IFixer fixer = null;
             try
             {
-                commandLineArguments = CommandLineArgumentsParser.Parse(args);
+                fixer = FixerImplementationSelector.SelectImplementation(options);
             }
-            catch (ArgumentException e)
+            catch (InvalidOperationException e)
             {
-                Console.Error.WriteLine(e);
-                return 1;
+                Console.Error.WriteLine(e.Message);
+                Environment.Exit(1);
             }
-
-            if (!commandLineArguments.ProjectFilePaths.Any() || commandLineArguments.Help)
-            {
-                Console.WriteLine(CommandLineArgumentsParser.HelpMessage);
-                return 0;
-            }
-
-            ProcessFiles(commandLineArguments.ProjectFilePaths, commandLineArguments.DryRun);
+            ProcessFiles(fixer, validPaths, options.DryRun);
 
             return 0;
         }
 
         private static void ProcessFiles(
+            IFixer fixer,
             IEnumerable<string> projectFilePaths,
             bool dryRun = false)
         {
-            var fixer = new Fixer();
             foreach (string projectFile in projectFilePaths)
             {
                 try
@@ -64,7 +68,7 @@ namespace CsprojLangVersionFixer
                 }
                 catch (Exception e)
                 {
-                    Console.Error.WriteLine($"{projectFile}: {e}");
+                    Console.Error.WriteLine($"{projectFile}: {e.Message}");
                 }
             }
         }
