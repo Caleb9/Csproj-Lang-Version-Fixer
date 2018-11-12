@@ -7,7 +7,7 @@ namespace CsprojFixer
     public sealed class FixerImplementationSelector
     {
         private const string LangVersionPropertyName = "LangVersion";
-        private const string TargetFrameworkVersionPropertyName = "TargetFrameworkVersionProperty";
+        private const string TargetFrameworkVersionPropertyName = "TargetFrameworkVersion";
 
         public static IFixer SelectImplementation(Options options)
         {
