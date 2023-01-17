@@ -1,3 +1,8 @@
+# ARCHIVED
+
+Major IDEs now provide this functionality out of the box.
+
+
 # What
 
 Simple utility for batch processing of legacy style of C# *.csproj
